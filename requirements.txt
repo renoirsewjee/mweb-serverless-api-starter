@@ -1,0 +1,8 @@
+flask
+flask-cors
+boto3
+pendulum
+requests
+pylint
+pytest
+pytest-cov
