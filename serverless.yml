@@ -48,7 +48,7 @@ provider:
   # aws_secret_access_key = ywj6m4ct.... 
   profile: ${opt:profile, 'mweb'}
   # The region in which the lambda should be deployed
-  region: ${opt:profile, 'eu-west-1'}
+  region: ${opt:region, 'eu-west-1'}
 
   # Define tags
   tags:
