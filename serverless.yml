@@ -57,7 +57,7 @@ provider:
 
   # IAM roles to access resources defined later in the file
   iamRoleStatements:
-    # DynamoDB
+    # Only DynamoDB is accessed from the lambda
     - Effect: Allow
       Action:
         - dynamodb:Query

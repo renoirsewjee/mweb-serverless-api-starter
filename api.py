@@ -98,7 +98,7 @@ def get_source_ip():
 #
 # User & IP whitelists
 #
-@app.route('/starter/sample')
+@app.route('/starter/sample_data')
 def get_sample_data():
     logger.info(f'getting sample data')
 
@@ -106,7 +106,7 @@ def get_sample_data():
     return to_web(APIResponse(status=constants.API_STATUS_OK, result={constants.SAMPLE_DATA_KEY: sample_data}))
 
 
-@app.route('/starter/sample', methods=['POST'])
+@app.route('/starter/sample_data', methods=['POST'])
 def save_sample_data():
     logger.info(f'saving sample data = {json.dumps(request.json)}')
 
@@ -116,3 +116,4 @@ def save_sample_data():
         return to_web(APIResponse(status=constants.API_STATUS_FAIL), 500)
     else:
         return to_web(APIResponse(status=constants.API_STATUS_OK))
+

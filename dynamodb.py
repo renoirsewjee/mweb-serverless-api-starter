@@ -29,13 +29,14 @@ DELETE_TIMESTAMP_KEY = 'delete_timestamp_utc'
 
 # Prefixes & Constants for table column values
 TABLE_SORT_KEY_PREFIX_LATEST = 'latest_'
-TABLE_PARTITION_KEY_SAMPLE_DATA = 'sample_data_'
+TABLE_PARTITION_KEY_SAMPLE_DATA = 'sample_data'
+TABLE_SORT_KEY_SAMPLE_DATA = 'sample_data'
 
 @dataclass
 class QueryResult:
     partition_key: str
     sort_key: str
-    payload: Dict[str, Any]
+    payload: Any
 
 
 class Repository(object):
@@ -48,13 +49,22 @@ class Repository(object):
     #
     # Generic functions for reading, saving and querying items   
     #
-    def query_items(self, partition_key: str, sort_key_prefix: str = None) -> List[QueryResult]:
+    def query_items_begins_with_sort_key(self, partition_key: str, sort_key_prefix: str = None) -> List[QueryResult]:
+        if sort_key_prefix:
+            sort_key_expression = Key(TABLE_SORT_KEY).begins_with(sort_key_prefix)
+        else:
+            sort_key_expression = None
+
+        return self.query_items(partition_key=partition_key, sort_key_expression=sort_key_expression)
+
+
+    def query_items(self, partition_key: str, sort_key_expression = None) -> List[QueryResult]:
         logger.info(f'querying items by sort key prefix partition_key = {partition_key}, sort_key_prefix = {sort_key_prefix}')
         
         projection_expression = f'{TABLE_SORT_KEY},{PAYLOAD_KEY}'
         key_condition_expr = Key(TABLE_PARTITION_KEY).eq(partition_key)
-        if sort_key_prefix:
-            key_condition_expr = key_condition_expr & Key(TABLE_SORT_KEY).begins_with(sort_key_prefix)
+        if sort_key_expression:
+            key_condition_expr = key_condition_expr & sort_key_expression
 
         results = []
 
@@ -77,7 +87,7 @@ class Repository(object):
         return results
 
 
-    def read_audited_item_lastest(self, partition_key: str, sort_key_suffix: str) -> Dict[str, Any]:
+    def read_audited_item_lastest(self, partition_key: str, sort_key_suffix: str) -> Any:
         logger.info(f'reading lastest audited item partition_key = {partition_key}, sort_key_suffix = {sort_key_suffix}')
         
         response = self.service_table.get_item(Key={TABLE_PARTITION_KEY: partition_key, 
@@ -90,10 +100,12 @@ class Repository(object):
             return None
 
 
-    def save_audited_item(self, partition_key: str, sort_key_suffix: str, timestamp: str, payload: Dict[str, Any], delete_ts: int = None) -> bool:
+    # Uses DynamoDB transactions to store two entries into the table; The payload and partition key of both entries will be the same but 
+    # the sort key will differ. One entry entry will have the sort key prefixed by latest while the other will be prefixed with the current timestamp
+    def save_audited_item(self, partition_key: str, sort_key_suffix: str, timestamp: str, payload: Any, delete_ts: int = None) -> bool:
         logger.info(f'saving audited item partition_key = {partition_key}, sort_key_suffix = {sort_key_suffix}, timestamp = {timestamp}')
 
-        # Going to put 2 rows in the table both having the same partition key but different sort keys
+        # Convert payload to DynamoDB format
         payload_serialized = self.type_serializer.serialize(payload)
 
         latest_put_item = {PUT_KEY: {ITEM_KEY: {TABLE_PARTITION_KEY: {'S': partition_key},
@@ -173,3 +185,8 @@ class Repository(object):
     # CRUD for Sample Data
     #
     
+    def read_sample_data(self) -> Any:
+        return self.read_item(partition_key=TABLE_PARTITION_KEY_SAMPLE_DATA, sort_key=TABLE_SORT_KEY_SAMPLE_DATA)
+
+    def save_sample_data(self, data: Any) -> bool:
+        return self.save_item(partition_key=TABLE_PARTITION_KEY_SAMPLE_DATA, sort_key=TABLE_SORT_KEY_SAMPLE_DATA, payload=data)
