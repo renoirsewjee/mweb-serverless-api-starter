@@ -1,0 +1,27 @@
+{
+  "name": "mweb-serverless-api-starter",
+  "version": "1.0.0",
+  "description": "Serverless API using APIGW and DynamoDB",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "serverless-wsgi": "^1.7.3",
+    "serverless-python-requirements": "^5.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/renoirsewjee/mweb-serverless-api-starter.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/renoirsewjee/mweb-serverless-api-starter/issues"
+  },
+  "homepage": "https://github.com/renoirsewjee/mweb-serverless-api-starter#readme"
+}
