@@ -49,7 +49,15 @@ provider:
   profile: ${opt:profile, 'mweb'}
   # The region in which the lambda should be deployed
   region: ${opt:region, 'eu-west-1'}
-
+  
+  # The serverless framework usually creates a new bucket
+  # for each new service-stage combination. To prevent many
+  # buckets being created one can specify a deployment bucket
+  #
+  # Reuse an existing bucket for the deployment artifacts
+  deploymentBucket:
+    name: mweb-serverless-deployments
+  
   # Define tags
   tags:
     "mweb:billing": "${self:provider.stage}"
