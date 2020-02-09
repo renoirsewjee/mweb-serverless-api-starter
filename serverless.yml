@@ -30,8 +30,8 @@ provider:
   logRetentionInDays: 30
   # Deployment will be to AWS
   name: aws
-  # Python 3.7 will be used
-  runtime: python3.7
+  # Python 3.8 will be used
+  runtime: python3.8
   # Memory size is a dial that controls both RAM and CPU
   # Allocating more RAM will result in more CPU being allocated to the lambda
   memorySize: 512
